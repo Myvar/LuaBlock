@@ -288,8 +288,8 @@ namespace luablock
 
             Schematic s = new Schematic();
             s.Height = 1;
-            s.Width = (short)((Methods.Count * 2) + maxlw);
-            s.Length = (short)(maxl * 2 + 2);
+            s.Width = (short)((Methods.Count * 2) + maxlw + 5) ;
+            s.Length = (short)(maxl * 2 + 2 + 5); 
             s.Fill();
             int x = 0;
             foreach (var ii in Methods)

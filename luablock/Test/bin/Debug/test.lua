@@ -2,15 +2,7 @@
 function isten()
 	if vara == 10 then
 
-		print("@a", "Vara is: ", vara)
-
-	end
-end
-
-function istwenty()
-	if vara == 20 then
-
-		print("@a", "Vara is: ", vara)
+		print("@a", "§aVara is: ", vara)
 
 	end
 end
@@ -34,12 +26,6 @@ function main()
 	print("@a", "The vlaue is: ", vara)
 
 	isten()
-	
-	vara = vara * 2
-	
-	print("@a", "The vlaue is: ", vara)
-	
-	istwenty()
 end
 
 main()
