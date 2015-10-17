@@ -43,6 +43,22 @@ namespace luablock
 
             Methods.Add("classlevel", BuildBody(z.Statements));
 
+            //build clean up code
+            List<string> CleanUp = new List<string>();
+            int total = 0;
+            foreach(var i in Methods)
+            {
+                foreach(var x in i.Value)
+                {
+                    total++;
+                    if (x.TrimStart('/').StartsWith("scoreboard objectives add"))
+                    {
+                        CleanUp.Add("/scoreboard objectives remove " + x.TrimStart('/').Split(' ')[3]);
+                    }
+                }
+            }
+            Methods["classlevel"].Add("|" + (total / 4));//indicated we need more repeaters
+            Methods["classlevel"].AddRange(CleanUp);
             BuildSchematic(schmaticpath);
 
         }
@@ -130,7 +146,7 @@ namespace luablock
                         else
                         {
                             var name = TypeToString((x.Variables[0] as Variable));
-                            Lines.Add("/scoreboard objectives remove " + name);
+                            //Lines.Add("/scoreboard objectives remove " + name);
                             Lines.Add("/scoreboard objectives add " + name + " dummy");
                             Lines.Add("/scoreboard players set lua " + name + " " + TypeToString(x.Expressions[0]));
                         }
@@ -154,7 +170,7 @@ namespace luablock
             {
                 a = name + "_opt_" + optc;
                 optc++;
-                Lines.Add("/scoreboard objectives remove " + a);
+                //Lines.Add("/scoreboard objectives remove " + a);
                 Lines.Add("/scoreboard objectives add " + a + " dummy");
                 var ln =  iterateBinOp(bb.Left as BinaryExpression, a , Lines);
                 Lines.Add("/scoreboard players operation lua " + a + " " + "+=" + " lua " + ln);
@@ -164,7 +180,7 @@ namespace luablock
                 if(char.IsDigit(TypeToString(bb.Left)[0]))
                 {
                     //and new var
-                    Lines.Add("/scoreboard objectives remove con_" + ConstantCount);
+                    //Lines.Add("/scoreboard objectives remove con_" + ConstantCount);
                     Lines.Add("/scoreboard objectives add con_" + ConstantCount + " dummy");
                     Lines.Add("/scoreboard players set lua con_" + ConstantCount + " " + TypeToString(bb.Left));
                     a = "con_" + ConstantCount;
@@ -180,7 +196,7 @@ namespace luablock
             {
                 b = name + "_opt_" + optc;
                 optc++;
-                Lines.Add("/scoreboard objectives remove " + b);
+               // Lines.Add("/scoreboard objectives remove " + b);
                 Lines.Add("/scoreboard objectives add " + b + " dummy");
                 var ln = iterateBinOp(bb.Right as BinaryExpression, b, Lines);
                 Lines.Add("/scoreboard players operation lua " + b + " " + "+=" + " lua " + ln);
@@ -190,7 +206,7 @@ namespace luablock
                 if (char.IsDigit(TypeToString(bb.Right)[0]))
                 {
                     //and new var
-                    Lines.Add("/scoreboard objectives remove con_" + ConstantCount);
+                   // Lines.Add("/scoreboard objectives remove con_" + ConstantCount);
                     Lines.Add("/scoreboard objectives add con_" + ConstantCount + " dummy");
                     Lines.Add("/scoreboard players set lua con_" + ConstantCount + " " + TypeToString(bb.Right));
                     b = "con_" + ConstantCount;
@@ -249,17 +265,30 @@ namespace luablock
         public void BuildSchematic(string schmaticpath)
         {
             int maxl = 0;
+            int maxlw = 0;
             foreach (var i in Methods)
             {
                 if (i.Value.Count > maxl)
                 {
                     maxl = i.Value.Count;
                 }
+                foreach (var iyy in i.Value)
+                {
+                    var iz = iyy;
+                    if (iz.StartsWith("|"))
+                    {
+                        iz = iz.TrimStart('|');
+                        maxlw += int.Parse(iz);
+                    }
+                }
             }
+
+
+
 
             Schematic s = new Schematic();
             s.Height = 1;
-            s.Width = (short)(Methods.Count * 2);
+            s.Width = (short)((Methods.Count * 2) + maxlw);
             s.Length = (short)(maxl * 2 + 2);
             s.Fill();
             int x = 0;
@@ -271,29 +300,44 @@ namespace luablock
                 {
                     var i = iyy;
 
-                    int b = 2;
-                    if (!i.StartsWith("/"))
+                    if (i.StartsWith("|"))
                     {
-                        b = 6;
-                    }
-                    if (i.StartsWith("#"))
-                    {
-                        i = i.TrimStart('#');
-                        s.SetBlock(x, 0, z + 1, new Block() { ID = 149, Metta = 2 });
+                        i = i.TrimStart('|');
+                        for (int iu = 0; iu < int.Parse(i); iu++)
+                        {
+                            s.SetBlock(x, 0, z, new Block() { ID = 93, Metta = 14 }); // full tic repeater
+                            z++;
+                        }
+
                     }
                     else
                     {
-                        s.SetBlock(x, 0, z + 1, new Block() { ID = 93, Metta = b });
+                        int b = 2;
+                        if (!i.StartsWith("/"))
+                        {
+                            b = 6;
+                        }
+                        if (i.StartsWith("#"))
+                        {
+                            i = i.TrimStart('#');
+                            s.SetBlock(x, 0, z + 1, new Block() { ID = 149, Metta = 2 });
+                        }
+                        else
+                        {
+                            s.SetBlock(x, 0, z + 1, new Block() { ID = 93, Metta = b });
+                        }
+                        s.SetBlock(x, 0, z, new Block() { ID = 137, Metta = 0, Command = i });
+                        z += 2;
                     }
-                    s.SetBlock(x, 0, z, new Block() { ID = 137, Metta = 0, Command = i });
-                    z += 2;
-                }               
+                }
                 s.SetBlock(x, 0, z, new Block() { ID = 137, Metta = 0, Command = "/setblock ~ ~ ~-" + (z + 1) + " minecraft:air" });
                 x += 2;
             }
-           
             s.Save(schmaticpath);
         }
+           
+           
+        
 
         private string TypeToString(IExpression e)
         {

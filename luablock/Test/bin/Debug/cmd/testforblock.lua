@@ -1,4 +1,4 @@
-ret = "/testforblock"
+ret = "#/testforblock"
 
 for i=0,argsl,1
 do 
