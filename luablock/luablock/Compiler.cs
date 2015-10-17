@@ -15,6 +15,8 @@ namespace luablock
     {
         public Dictionary<string, List<string>> Methods = new Dictionary<string, List<string>>();
 
+        public int ConstantCount = 0;
+
         public Compiler()
         {
             if(Directory.Exists("cmd"))
@@ -64,9 +66,9 @@ namespace luablock
                         }
                         else
                         {
-                            
+
                             var index = (Methods.Keys.ToList().IndexOf(TypeToString(x.Function)));
-                            ins =  (Methods.Count - index ) * 2;
+                            ins = (Methods.Count - index) * 2;
 
 
                         }
@@ -87,10 +89,99 @@ namespace luablock
                         var fnc = x.Expressions[0] as FunctionDefinition;
                         Methods.Add(TypeToString((x.Variables[0] as Variable)), BuildBody(fnc.Body.Statements));
                     }
+                    else
+                    {
+                        if (x.Expressions[0] is BinaryExpression)
+                        {
+                            var name = TypeToString((x.Variables[0] as Variable));
+                            var j = x.Expressions[0] as BinaryExpression;
+                            iterateBinOp(j, name , Lines);
+
+                        }
+                        else
+                        {
+                            var name = TypeToString((x.Variables[0] as Variable));
+                            Lines.Add("/scoreboard objectives remove " + name);
+                            Lines.Add("/scoreboard objectives add " + name + " dummy");
+                            Lines.Add("/scoreboard players set lua " + name + " " + TypeToString(x.Expressions[0]));
+                        }
+                    }
                 }
             }
 
             return Lines;
+        }
+
+
+        public int optc = 0;
+        public string iterateBinOp(BinaryExpression bb, string name, List<string> Lines)
+        {
+            var line = "";
+            string a = "";
+            string b = "";
+
+            if (bb.Left is BinaryExpression)
+            {
+                a = name + "_opt_" + optc;
+                optc++;
+                Lines.Add("/scoreboard objectives remove " + a);
+                Lines.Add("/scoreboard objectives add " + a + " dummy");
+                var ln =  iterateBinOp(bb.Left as BinaryExpression, a , Lines);
+                Lines.Add("/scoreboard players operation lua " + a + " " + "+=" + " lua " + ln);
+            }
+            else
+            {
+                if(char.IsDigit(TypeToString(bb.Left)[0]))
+                {
+                    //and new var
+                    Lines.Add("/scoreboard objectives remove con_" + ConstantCount);
+                    Lines.Add("/scoreboard objectives add con_" + ConstantCount + " dummy");
+                    Lines.Add("/scoreboard players set lua con_" + ConstantCount + " " + TypeToString(bb.Left));
+                    a = "con_" + ConstantCount;
+                    ConstantCount++;
+                }
+                else
+                {
+                    a = TypeToString(bb.Left);
+                }
+            }
+
+            if (bb.Right is BinaryExpression)
+            {
+                b = name + "_opt_" + optc;
+                optc++;
+                Lines.Add("/scoreboard objectives remove " + b);
+                Lines.Add("/scoreboard objectives add " + b + " dummy");
+                var ln = iterateBinOp(bb.Right as BinaryExpression, b, Lines);
+                Lines.Add("/scoreboard players operation lua " + b + " " + "+=" + " lua " + ln);
+            }
+            else
+            {
+                if (char.IsDigit(TypeToString(bb.Right)[0]))
+                {
+                    //and new var
+                    Lines.Add("/scoreboard objectives remove con_" + ConstantCount);
+                    Lines.Add("/scoreboard objectives add con_" + ConstantCount + " dummy");
+                    Lines.Add("/scoreboard players set lua con_" + ConstantCount + " " + TypeToString(bb.Right));
+                    b = "con_" + ConstantCount;
+                    ConstantCount++;
+                }
+                else
+                {
+                    b = TypeToString(bb.Right);
+                }
+            }
+            
+
+            Lines.Add("/scoreboard players operation lua " + a + " " + BuildBOp(bb.Operation) + " lua " + b );
+            line = a;
+            return line;
+        }
+
+        public string BuildBOp(BinaryOp bo)
+        {
+
+            return "+=";
         }
 
         public List<string> ArgBuilder(List<IExpression> perams)

@@ -1,22 +1,9 @@
 
-function Hi()
-say("[ §aInfo ]Wellcome to Lua block");
-end
 
-function Panic()
-say("[ §cPanic ]an faital error has ocured");
-end
+vara = 10
 
-function Error()
-say("[ §cError ]an error has ocured");
-end
+print("@a", "The vlaue is: ", vara)
 
-setblock(1 ,1 ,1 , "minecraft:stone")
-gamemode("a", "@a")
-Hi()
-say("test", "@a")
-say("test")
-Hi()
-Panic()
-Error()
-gamemode("c", "@a")
+vara = vara + 50 + 15
+
+print("@a", "The vlaue is: ", vara)
