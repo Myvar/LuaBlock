@@ -187,9 +187,9 @@ namespace luablock
                 case BinaryOp.Subtraction:
                     return "-=";
                 case BinaryOp.Division:
-                    return "*=";
-                case BinaryOp.Multiplication:
                     return "/=";
+                case BinaryOp.Multiplication:
+                    return "*=";
             }
             return "+=";
         }

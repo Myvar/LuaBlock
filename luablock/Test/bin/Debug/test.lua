@@ -12,6 +12,6 @@ vara = vara - 70
 
 print("@a", "The vlaue is: ", vara)
 
-vara = vara * 10
+vara = vara * 2
 
 print("@a", "The vlaue is: ", vara)
