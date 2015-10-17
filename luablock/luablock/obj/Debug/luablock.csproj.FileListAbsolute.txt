@@ -1,0 +1,13 @@
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\luablock.dll
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\luablock.pdb
+C:\Users\Myvar\Desktop\luablock\luablock\obj\Debug\luablock.csprojResolveAssemblyReference.cache
+C:\Users\Myvar\Desktop\luablock\luablock\obj\Debug\luablock.dll
+C:\Users\Myvar\Desktop\luablock\luablock\obj\Debug\luablock.pdb
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\Irony.dll
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\Irony.pdb
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\Irony.xml
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\fNbt.dll
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\fNbt.pdb
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\MoonSharp.Interpreter.dll
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\MoonSharp.Interpreter.pdb
+C:\Users\Myvar\Desktop\luablock\luablock\bin\Debug\MoonSharp.Interpreter.xml
