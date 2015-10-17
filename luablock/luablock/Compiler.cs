@@ -47,11 +47,40 @@ namespace luablock
 
         }
 
-        public List<string> BuildBody(List<IStatement> Statments)
+        public int IFsfound = 0;
+
+        public void iterateLogic(List<string> Lines, IfStat ifs)
         {
-            List<string> Lines = new List<string>();
+
+            var a = TypeToString((ifs.Condition as BinaryExpression).Left);
+            var b = TypeToString((ifs.Condition as BinaryExpression).Right);
+
+            Lines.Add("#/scoreboard players test lua " + a + " " + b + " " + b);
+        }
+
+
+        public List<string> BuildBody(List<IStatement> Statments, List<string> Linesa = null)
+        {
+            if(Linesa == null)
+            {
+                Linesa = new List<string>();
+            }
+            List<string> Lines = Linesa;
             foreach (var i in Statments)
             {
+                if(i is IfStat)
+                {
+                    var x = i as IfStat;
+                    iterateLogic(Lines, x);
+                    Methods.Add("lua_if_" + IFsfound, BuildBody(x.Block.Statements));
+                    var tmplines = Lines.ToArray().ToList();
+                    //tmplines.Add("");
+                    var bd = BuildBody(new List<IStatement>() { new FunctionCall() { Arguments = new List<IExpression>(), Function = new StringLiteral() { Value = "lua_if_" + IFsfound } } }, tmplines);
+                    bd[bd.Count - 1] = bd[bd.Count - 1].TrimStart('/');// 1 tick repeater
+                    Lines.Add(bd[bd.Count - 1]);
+                    IFsfound++;
+                }
+
                 if (i is FunctionCall)
                 {
                     // /setblock ~ ~ ~ minecraft:redstone_block
@@ -114,6 +143,7 @@ namespace luablock
 
 
         public int optc = 0;
+
         public string iterateBinOp(BinaryExpression bb, string name, List<string> Lines)
         {
             var line = "";
@@ -237,16 +267,24 @@ namespace luablock
             {
                 int z = 1;
                 s.SetBlock(x, 0, 0, new Block() { ID = 93, Metta = 2 });
-                foreach (var i in ii.Value)
+                foreach (var iyy in ii.Value)
                 {
-
+                    var i = iyy;
 
                     int b = 2;
                     if (!i.StartsWith("/"))
                     {
                         b = 6;
                     }
-                    s.SetBlock(x, 0, z + 1, new Block() { ID = 93, Metta = b});
+                    if (i.StartsWith("#"))
+                    {
+                        i = i.TrimStart('#');
+                        s.SetBlock(x, 0, z + 1, new Block() { ID = 149, Metta = 2 });
+                    }
+                    else
+                    {
+                        s.SetBlock(x, 0, z + 1, new Block() { ID = 93, Metta = b });
+                    }
                     s.SetBlock(x, 0, z, new Block() { ID = 137, Metta = 0, Command = i });
                     z += 2;
                 }               
