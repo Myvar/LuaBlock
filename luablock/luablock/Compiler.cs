@@ -180,7 +180,17 @@ namespace luablock
 
         public string BuildBOp(BinaryOp bo)
         {
-
+            switch(bo)
+            {
+                case BinaryOp.Addition:
+                    return "+=";
+                case BinaryOp.Subtraction:
+                    return "-=";
+                case BinaryOp.Division:
+                    return "*=";
+                case BinaryOp.Multiplication:
+                    return "/=";
+            }
             return "+=";
         }
 
