@@ -121,6 +121,7 @@ namespace luablock
                     }
                     else
                     {
+
                         var y = CommandManager.GetCommand(TypeToString(x.Function));
                         Lines.Add(y.Parse(TypeToString(x.Function), ArgBuilder(x.Arguments)));
                     }
@@ -278,7 +279,8 @@ namespace luablock
                     if (iz.StartsWith("|"))
                     {
                         iz = iz.TrimStart('|');
-                        maxlw += int.Parse(iz);
+                        maxlw += int.Parse(iz + 2); // 2 exstra repeaters to give script time
+
                     }
                 }
             }
